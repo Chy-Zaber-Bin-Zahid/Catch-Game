@@ -3,7 +3,7 @@ from OpenGL.GLU import *
 from OpenGL.GLUT import *
 
 WINDOW_WIDTH  = 500
-WINDOW_HEIGHT = 800
+WINDOW_HEIGHT = 600
 
 class AABB:
     x = 0
@@ -21,19 +21,19 @@ class AABB:
                 self.y + self.h > other.y)     # y_max_1 > y_min_2
 
 # Global variables
-box1 = AABB(200, 150, 100, 100)
-box2 = AABB(350, 250, 50, 50)
-box_speed = 5
-collision = False
+# box1 = AABB(200, 150, 100, 100)
+# box2 = AABB(350, 250, 50, 50)
+# box_speed = 5
+# collision = False
 
-def draw_box(box):
-    global collision
-    is_colliding = collision
+# def draw_box(box):
+#     global collision
+#     is_colliding = collision
     
-    if is_colliding:
-        glColor3f(1.0, 0.0, 0.0)
-    else:
-        glColor3f(0.0, 1.0, 0.0)
+#     if is_colliding:
+#         glColor3f(1.0, 0.0, 0.0)
+#     else:
+#         glColor3f(0.0, 1.0, 0.0)
 
     # glBegin(GL_LINES)
     # glVertex2f(box.x, box.y)
@@ -57,13 +57,50 @@ def initialize():
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
 
-def check_collision():
-    global box1, box2, collision
+# def check_collision():
+#     global box1, box2, collision
 
-    if box1.collides_with(box2):
-        collision = True
-    else:
-        collision = False
+#     if box1.collides_with(box2):
+#         collision = True
+#     else:
+#         collision = False
+
+def midpoint(x1,y1,x2,y2,zone):
+    dx = x2-x1
+    dy = y2-y1
+    d = (2*dy) - dx
+    dE = 2*dy
+    dNE = 2*(dy-dx)
+    x = x1
+    y = y2
+    while (x<x2):
+        if d<=0:
+            d=d+dE
+            x+=1
+        else:
+            d=d+dNE
+            x+=1
+            y+=1
+        cx,cy = convertOriginal(x,y)
+        glVertex2f(cx,cy)
+
+
+
+def findZone(x1,y1,x2,y2):
+    
+
+def convertZone(x,y,zone):
+
+
+def convertOriginal(x,y,zone):
+
+def drawLine(x1,y1,x2,y2):
+    zone = findZone(x1,y1,x2,y2)
+    x1,y1 = convertZone(x1,y1,zone) 
+    x2,y2 = convertZone(x2,y2,zone) 
+    glBegin()
+    midpoint(x1,y1,x2,y2,zone)
+    glEnd()
 
 def show_screen():
     # this function should contain the logic for drawing objects
@@ -71,64 +108,64 @@ def show_screen():
 
     # clear the screen
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-
+    drawLine(100,200,200,300)
     # draw stuffs here
-    draw_box(box1)
-    draw_box(box2)
+    # draw_box(box1)
+    # draw_box(box2)
 
     # do not forget to call glutSwapBuffers() at the end of the function
     glutSwapBuffers()
 
-def keyboard_ordinary_keys(key, _, __):
-    # check against alphanumeric keys here (e.g. A..Z, 0..9, spacebar, punctuations)
-    # must cast characters to binary when comparing (e.g. key == b'q')
+# def keyboard_ordinary_keys(key, _, __):
+#     # check against alphanumeric keys here (e.g. A..Z, 0..9, spacebar, punctuations)
+#     # must cast characters to binary when comparing (e.g. key == b'q')
 
-    glutPostRedisplay()
+#     glutPostRedisplay()
 
-def keyboard_special_keys(key, _, __):
-    # check against special keys here (e.g. F1..F11, arrow keys, etc.)
-    # use GLUT_KEY_* constants while comparing (e.g. GLUT_KEY_F1, GLUT_KEY_LEFT, etc.)
-    global box1
+# def keyboard_special_keys(key, _, __):
+#     # check against special keys here (e.g. F1..F11, arrow keys, etc.)
+#     # use GLUT_KEY_* constants while comparing (e.g. GLUT_KEY_F1, GLUT_KEY_LEFT, etc.)
+#     global box1
 
-    if key == GLUT_KEY_UP:
-        box1.y += box_speed
-    elif key == GLUT_KEY_DOWN:
-        box1.y -= box_speed
-    elif key == GLUT_KEY_LEFT:
-        box1.x -= box_speed
-    elif key == GLUT_KEY_RIGHT:
-        if box1.x != 450:
-            box1.x += box_speed
-        print(box1.x)
+#     if key == GLUT_KEY_UP:
+#         box1.y += box_speed
+#     elif key == GLUT_KEY_DOWN:
+#         box1.y -= box_speed
+#     elif key == GLUT_KEY_LEFT:
+#         box1.x -= box_speed
+#     elif key == GLUT_KEY_RIGHT:
+#         if box1.x != 450:
+#             box1.x += box_speed
+#         print(box1.x)
 
-    glutPostRedisplay()
+#     glutPostRedisplay()
 
-def mouse_click(button, state, x, y):
-    # check for mouse clicks here (left, middle and right click)
-    # use GLUT_LEFT_BUTTON, GLUT_MIDDLE_BUTTON, GLUT_RIGHT_BUTTON constants while comparing
-    # use GLUT_DOWN and GLUT_UP constants while comparing for button state
-    # You should either listen to GLUT_DOWN or GLUT_UP, so filter that out
+# def mouse_click(button, state, x, y):
+#     # check for mouse clicks here (left, middle and right click)
+#     # use GLUT_LEFT_BUTTON, GLUT_MIDDLE_BUTTON, GLUT_RIGHT_BUTTON constants while comparing
+#     # use GLUT_DOWN and GLUT_UP constants while comparing for button state
+#     # You should either listen to GLUT_DOWN or GLUT_UP, so filter that out
 
-    # convert coordinates, (flip the y-axis first)
-    mx, my = x, WINDOW_HEIGHT - y
+#     # convert coordinates, (flip the y-axis first)
+#     mx, my = x, WINDOW_HEIGHT - y
 
-    # do your click detection here using button, state, mx, my
-
-
-    glutPostRedisplay()
-
-def animation():
-    # write codes here that's going to run every frame
-    # for example, updating coordinates of objects that move spotaneously
-    # or collision detection, or sink detection, etc.
-    # Note: DO NOT write drawing codes here
-
-    check_collision()
+#     # do your click detection here using button, state, mx, my
 
 
-    # don't forget to call glutPostRedisplay()
-    # otherwise your animation will be stuck
-    glutPostRedisplay()
+#     glutPostRedisplay()
+
+# def animation():
+#     # write codes here that's going to run every frame
+#     # for example, updating coordinates of objects that move spotaneously
+#     # or collision detection, or sink detection, etc.
+#     # Note: DO NOT write drawing codes here
+
+#     check_collision()
+
+
+#     # don't forget to call glutPostRedisplay()
+#     # otherwise your animation will be stuck
+#     glutPostRedisplay()
 
 glutInit()
 glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH)
@@ -137,11 +174,11 @@ glutInitWindowPosition(0, 0)
 wind = glutCreateWindow(b"OpenGL AABB Collision")
 
 glutDisplayFunc(show_screen)
-glutIdleFunc(animation)
+# glutIdleFunc(animation)
 
-glutKeyboardFunc(keyboard_ordinary_keys)
-glutSpecialFunc(keyboard_special_keys)
-glutMouseFunc(mouse_click)
+# glutKeyboardFunc(keyboard_ordinary_keys)
+# glutSpecialFunc(keyboard_special_keys)
+# glutMouseFunc(mouse_click)
 
 glEnable(GL_DEPTH_TEST)
 initialize()
