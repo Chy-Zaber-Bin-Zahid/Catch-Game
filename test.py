@@ -8,7 +8,12 @@ WINDOW_WIDTH  = 500
 WINDOW_HEIGHT = 600
 move = 0
 fall = 0
+point = 0
+speed = .1
+game = "continue"
 randomValue = random.randint(0, 440)
+basketOver = False
+play = "resume"
 
 colorFour = [[1.0,0.0,0.0],[0.0,0.0,1.0],[0.0,1.0,0.0],[1.0,1.0,0.0]]
 diamondColor = random.choice(colorFour)
@@ -41,19 +46,15 @@ class AABB:
 
 box1 = AABB(190, 10, 122, 31)
 box2 = AABB(15+randomValue, 510, 33, 40)
+box3 = AABB(10, 549, 38, 31)
+box4 = AABB(240, 545, 34, 35)
+box5 = AABB(450, 545, 31, 35)
 
-box_speed = 5
+box_speed = 7
 collision = False
 
 def draw_box(box):
-    global collision
-    is_colliding = collision
-
-    if is_colliding:
-        glColor3f(1.0, 0.0, 0.0)
-    else:
-        glColor3f(0.0, 1.0, 0.0)
-
+    glColor3f(0.0, 0.0, 0.0)
     glBegin(GL_LINES)
     glVertex2f(box.x, box.y)
     glVertex2f(box.x + box.w, box.y)
@@ -108,26 +109,7 @@ def midpoint(x1,y1,x2,y2,zone):
 def findZone(x1,y1,x2,y2):
     dx = abs(x2 - x1)
     dy = abs(y2 - y1)
-    # if dx>dy:
-    #     #zone 0,3,4,7
-    #     if dx >= 0 and dy >= 0:
-    #         return 0
-    #     elif dx <= 0 and dy >= 0:
-    #         return 3
-    #     elif dx >= 0 and dy <= 0:
-    #         return 7
-    #     else:
-    #         return 4
-    # else:
-    #     #zone 1,2,5,6
-    #     if dx >= 0 and dy >= 0:
-    #         return 1
-    #     elif dx <= 0 and dy >= 0:
-    #         return 2
-    #     elif dx >= 0 and dy <= 0:
-    #         return 6
-    #     else:
-    #         return 5
+
     if dx >= dy:
         if x1 <= x2:
             if y1 <= y2:
@@ -214,7 +196,7 @@ def drawLine(x1,y1,x2,y2):
 
 
 def show_screen():
-    global move,fall,diamondCornerZero,diamondCornerFifteen,diamondCornerThirty,randomValue,r,g,b
+    global move,fall,diamondCornerZero,diamondCornerFifteen,diamondCornerThirty,randomValue,r,g,b, basketOver, play
     # clear the screen
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     #diamond
@@ -225,15 +207,43 @@ def show_screen():
     drawLine(diamondCornerFifteen+randomValue,510+fall,diamondCornerThirty+randomValue,529+fall)
 
     #basket
-    glColor3f(1, 1, 1)
+    if basketOver == False: 
+      glColor3f(1, 1, 1)
+    else:
+      glColor3f(1.0, 0.0, 0.0)
     drawLine(210+move,10,290+move,10)
     drawLine(190+move,40,310+move,40)
     drawLine(270+move,10,290+move,40)
     drawLine(169+move,40,190+move,10)
 
+    #playAgain
+    glColor3f(0.529, 0.808, 0.922)
+    drawLine(10,565,45,565)
+    drawLine(0,564,10,580)
+    drawLine(0,565,10,550)
+
+    if play == "resume":
+      #pause
+      glColor3f(1.0, 0.647, 0.0)
+      drawLine(247,545,247,580)
+      drawLine(257,545,257,580)
+    else:
+      #play
+      glColor3f(1.0, 0.647, 0.0)
+      drawLine(240,545,240,580)
+      drawLine(239,525,270,545)
+      drawLine(240,594,270,579)
+
+    #close
+    glColor3f(1,0.0, 0.0)
+    drawLine(420,545,450,580)
+    drawLine(420,580,450,545)
 
     draw_box(box1)
     draw_box(box2)
+    draw_box(box3)
+    draw_box(box4)
+    draw_box(box5)
 
     glutSwapBuffers()
 
@@ -243,34 +253,46 @@ def keyboard_special_keys(key, _, __):
     if key == GLUT_KEY_LEFT:
         if move != -190:
             box1.x -= box_speed
-            move-=5
+            move-=7
     elif key == GLUT_KEY_RIGHT:
         if move != 190:
             box1.x += box_speed
-            move+=5
+            move+=7
         
 
     glutPostRedisplay()
 
 def animation():
-    global fall,randomValue,diamondColor,r,g,b,colorFour,box1, collision,diamondCornerThirty
+    global fall,randomValue,diamondColor,r,g,b,colorFour,box1, collision,diamondCornerThirty, point,game,speed, basketOver
     check_collision()
-    fall-=.1
-    box2.y-=.1
-    if collision:
-        fall = 0
-        randomValue = random.randint(0, 440)
-        box2.y = 50+randomValue
-        previous = diamondColor
-        colorFour.remove(previous)
-        diamondColor = random.choice(colorFour)
-        colorFour.append(previous)
-        r = diamondColor[0]
-        g = diamondColor[1]
-        b = diamondColor[2]
-        collision = False
-    elif fall < -530:
-        print(f"Game Over!")
+
+    if game == "continue":
+        if speed <= .3:
+          fall-=speed
+          box2.y-=speed
+        else:
+          fall-=.2
+          box2.y-=.2
+        if collision:
+            fall = 0
+            randomValue = random.randint(0, 440)
+            box2.y = 510
+            box2.x = randomValue+15
+            previous = diamondColor
+            colorFour.remove(previous)
+            diamondColor = random.choice(colorFour)
+            colorFour.append(previous)
+            r = diamondColor[0]
+            g = diamondColor[1]
+            b = diamondColor[2]
+            collision = False
+            speed+=.05
+            point+=1
+            print(f"You Scored {point}")
+        elif fall < -551:
+            print(f"Game Over your score {point}!")
+            game="finished"
+            basketOver = True
 
 
 

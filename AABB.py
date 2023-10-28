@@ -15,15 +15,17 @@ class AABB:
         self.x, self.y, self.w, self.h = x, y, w, h
     
     def collides_with(self, other):
+        print(other.x)
         return (self.x < other.x + other.w and # x_min_1 < x_max_2
                 self.x + self.w > other.x  and # x_max_1 > m_min_2
                 self.y < other.y + other.h and # y_min_1 < y_max_2
                 self.y + self.h > other.y)     # y_max_1 > y_min_2
 
+
 # Global variables
-box1 = AABB(50, 50, 100, 0)
+box1 = AABB(50, 50, 70, 70)
 box2 = AABB(350, 250, 50, 50)
-box_speed = 5
+
 collision = False
 
 def draw_box(box):
