@@ -4,6 +4,7 @@ from OpenGL.GLUT import *
 
 WINDOW_WIDTH  = 500
 WINDOW_HEIGHT = 600
+move = 0
 
 class AABB:
     x = 0
@@ -14,40 +15,12 @@ class AABB:
     def __init__(self, x, y, w, h):
         self.x, self.y, self.w, self.h = x, y, w, h
     
-    def collides_with(self, other):
-        return (self.x < other.x + other.w and # x_min_1 < x_max_2
-                self.x + self.w > other.x  and # x_max_1 > m_min_2
-                self.y < other.y + other.h and # y_min_1 < y_max_2
-                self.y + self.h > other.y)     # y_max_1 > y_min_2
+    # def collides_with(self, other):
+    #     return (self.x < other.x + other.w and # x_min_1 < x_max_2
+    #             self.x + self.w > other.x  and # x_max_1 > m_min_2
+    #             self.y < other.y + other.h and # y_min_1 < y_max_2
+    #             self.y + self.h > other.y)     # y_max_1 > y_min_2
 
-# Global variables
-# box1 = AABB(200, 150, 100, 100)
-# box2 = AABB(350, 250, 50, 50)
-# box_speed = 5
-# collision = False
-
-# def draw_box(box):
-#     global collision
-#     is_colliding = collision
-    
-#     if is_colliding:
-#         glColor3f(1.0, 0.0, 0.0)
-#     else:
-#         glColor3f(0.0, 1.0, 0.0)
-
-    # glBegin(GL_LINES)
-    # glVertex2f(box.x, box.y)
-    # glVertex2f(box.x + box.w, box.y)
-
-    # glVertex2f(box.x + box.w, box.y)
-    # glVertex2f(box.x + box.w, box.y + box.h)
-
-    # glVertex2f(box.x + box.w, box.y + box.h)
-    # glVertex2f(box.x, box.y + box.h)
-
-    # glVertex2f(box.x, box.y + box.h)
-    # glVertex2f(box.x, box.y)
-    # glEnd()
 
 def initialize():
     glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT)
@@ -57,58 +30,153 @@ def initialize():
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
 
-# def check_collision():
-#     global box1, box2, collision
-
-#     if box1.collides_with(box2):
-#         collision = True
-#     else:
-#         collision = False
-
 def midpoint(x1,y1,x2,y2,zone):
     dx = x2-x1
     dy = y2-y1
     d = (2*dy) - dx
     dE = 2*dy
     dNE = 2*(dy-dx)
-    x = x1
-    y = y2
-    while (x<x2):
+    xInitial = x1
+    yInitial = y2
+    while (xInitial<x2):
         if d<=0:
             d=d+dE
-            x+=1
+            xInitial+=1
         else:
             d=d+dNE
-            x+=1
-            y+=1
-        cx,cy = convertOriginal(x,y)
+            xInitial+=1
+            yInitial+=1
+        cx,cy = convertOriginal(xInitial,yInitial,zone)
         glVertex2f(cx,cy)
 
 
 
 def findZone(x1,y1,x2,y2):
-    
+    dx = abs(x2 - x1)
+    dy = abs(y2 - y1)
+    # if dx>dy:
+    #     #zone 0,3,4,7
+    #     if dx >= 0 and dy >= 0:
+    #         return 0
+    #     elif dx <= 0 and dy >= 0:
+    #         return 3
+    #     elif dx >= 0 and dy <= 0:
+    #         return 7
+    #     else:
+    #         return 4
+    # else:
+    #     #zone 1,2,5,6
+    #     if dx >= 0 and dy >= 0:
+    #         return 1
+    #     elif dx <= 0 and dy >= 0:
+    #         return 2
+    #     elif dx >= 0 and dy <= 0:
+    #         return 6
+    #     else:
+    #         return 5
+    if dx >= dy:
+        if x1 <= x2:
+            if y1 <= y2:
+                return 0
+            else:
+                return 7
+        else:
+            if y1 <= y2:
+                return 3
+            else:
+                return 4
+    else:
+        if x1 <= x2:
+            if y1 <= y2:
+                return 1
+            else:
+                return 6
+        else:
+            if y1 <= y2:
+                return 2
+            else:
+                return 5
+        
 
 def convertZone(x,y,zone):
-
+    if zone == 0:
+        return x,y
+    elif zone == 1:
+        x,y = y,x
+        return x,y
+    elif zone == 2:
+        x,y = y,-x
+        return x,y
+    elif zone == 3:
+        x,y = -x,y
+        return x,y
+    elif zone == 4:
+        x,y = -x,-y
+        return x,y
+    elif zone == 5:
+        x,y = -y,-x
+        return x,y
+    elif zone == 6:
+        x,y = -y,x
+        return x,y
+    else:
+        x,y = x,-y
+        return x,y
 
 def convertOriginal(x,y,zone):
+    if zone == 0:
+        return x,y
+    elif zone == 1:
+        x,y = y,x
+        return x,y
+    elif zone == 2:
+        x,y = -y,x
+        return x,y
+    elif zone == 3:
+        x,y = -x,y
+        return x,y
+    elif zone == 4:
+        x,y = -x,-y
+        return x,y
+    elif zone == 5:
+        x,y = -y,-x
+        return x,y
+    elif zone == 6:
+        x,y = y,-x
+        return x,y
+    else:
+        x,y = x,-y
+        return x,y
 
 def drawLine(x1,y1,x2,y2):
+    if x1>x2:
+        x1,x2,y1,y2 =x2,x1,y2,y1 
     zone = findZone(x1,y1,x2,y2)
     x1,y1 = convertZone(x1,y1,zone) 
     x2,y2 = convertZone(x2,y2,zone) 
-    glBegin()
+    glBegin(GL_POINTS)
     midpoint(x1,y1,x2,y2,zone)
     glEnd()
 
+0
 def show_screen():
+    global move
     # this function should contain the logic for drawing objects
     # DO NOT do game logic here (e.g. object movement, collision detection, sink detection etc.)
 
     # clear the screen
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-    drawLine(100,200,200,300)
+    # drawLine(20,10,100,10)
+    # drawLine(0,40,120,40)
+    # drawLine(80,10,100,40)
+    # drawLine(-21,40,0,10)
+
+    drawLine(210+move,10,290+move,10)
+    drawLine(190+move,40,310+move,40)
+    drawLine(270+move,10,290+move,40)
+    drawLine(169+move,40,190+move,10)
+
+
     # draw stuffs here
     # draw_box(box1)
     # draw_box(box2)
@@ -116,56 +184,26 @@ def show_screen():
     # do not forget to call glutSwapBuffers() at the end of the function
     glutSwapBuffers()
 
-# def keyboard_ordinary_keys(key, _, __):
-#     # check against alphanumeric keys here (e.g. A..Z, 0..9, spacebar, punctuations)
-#     # must cast characters to binary when comparing (e.g. key == b'q')
 
-#     glutPostRedisplay()
+def keyboard_special_keys(key, _, __):
+    global move
+    if key == GLUT_KEY_LEFT:
+        if move != -190:
+            move-=5
+    elif key == GLUT_KEY_RIGHT:
+        if move != 190:
+            move+=5
 
-# def keyboard_special_keys(key, _, __):
-#     # check against special keys here (e.g. F1..F11, arrow keys, etc.)
-#     # use GLUT_KEY_* constants while comparing (e.g. GLUT_KEY_F1, GLUT_KEY_LEFT, etc.)
-#     global box1
-
-#     if key == GLUT_KEY_UP:
-#         box1.y += box_speed
-#     elif key == GLUT_KEY_DOWN:
-#         box1.y -= box_speed
-#     elif key == GLUT_KEY_LEFT:
-#         box1.x -= box_speed
-#     elif key == GLUT_KEY_RIGHT:
-#         if box1.x != 450:
-#             box1.x += box_speed
-#         print(box1.x)
-
-#     glutPostRedisplay()
-
-# def mouse_click(button, state, x, y):
-#     # check for mouse clicks here (left, middle and right click)
-#     # use GLUT_LEFT_BUTTON, GLUT_MIDDLE_BUTTON, GLUT_RIGHT_BUTTON constants while comparing
-#     # use GLUT_DOWN and GLUT_UP constants while comparing for button state
-#     # You should either listen to GLUT_DOWN or GLUT_UP, so filter that out
-
-#     # convert coordinates, (flip the y-axis first)
-#     mx, my = x, WINDOW_HEIGHT - y
-
-#     # do your click detection here using button, state, mx, my
-
-
-#     glutPostRedisplay()
+    glutPostRedisplay()
 
 # def animation():
-#     # write codes here that's going to run every frame
-#     # for example, updating coordinates of objects that move spotaneously
-#     # or collision detection, or sink detection, etc.
-#     # Note: DO NOT write drawing codes here
-
-#     check_collision()
 
 
-#     # don't forget to call glutPostRedisplay()
-#     # otherwise your animation will be stuck
+
+
 #     glutPostRedisplay()
+
+
 
 glutInit()
 glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH)
@@ -177,7 +215,7 @@ glutDisplayFunc(show_screen)
 # glutIdleFunc(animation)
 
 # glutKeyboardFunc(keyboard_ordinary_keys)
-# glutSpecialFunc(keyboard_special_keys)
+glutSpecialFunc(keyboard_special_keys)
 # glutMouseFunc(mouse_click)
 
 glEnable(GL_DEPTH_TEST)
