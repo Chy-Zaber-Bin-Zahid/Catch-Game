@@ -14,6 +14,7 @@ game = "continue"
 randomValue = random.randint(0, 440)
 basketOver = False
 play = "resume"
+stop = "unfreeze"
 
 colorFour = [[1.0,0.0,0.0],[0.0,0.0,1.0],[0.0,1.0,0.0],[1.0,1.0,0.0]]
 diamondColor = random.choice(colorFour)
@@ -49,6 +50,7 @@ box2 = AABB(15+randomValue, 510, 33, 40)
 box3 = AABB(10, 549, 38, 31)
 box4 = AABB(240, 545, 34, 35)
 box5 = AABB(450, 545, 31, 35)
+boxes = [box3, box4, box5]
 
 box_speed = 7
 collision = False
@@ -76,6 +78,44 @@ def check_collision():
         collision = True
     else:
         collision = False
+
+def mouse_click(button, state, x, y):
+    global boxes, point, move,fall,speed, randomValue,box, game, basketOver, play, stop
+    if button == GLUT_LEFT_BUTTON and state == GLUT_DOWN:
+        mouse_x = x
+        mouse_y = WINDOW_HEIGHT - y
+
+        # Create a new AABB representing the clicked point
+        clicked_box = AABB(mouse_x, mouse_y, 1, 1)
+
+        # Check for collision with each box
+        for box in boxes:
+            if box.collides_with(clicked_box):
+                if boxes.index(box) == 0:
+                    move = 0
+                    fall = 0
+                    point = 0
+                    speed = .1
+                    box2.y = 510
+                    box1.x = 190
+                    randomValue = random.randint(0, 440)
+                    box2.x = randomValue+15
+                    game = "continue"
+                    basketOver = False
+                    play = "resume"
+                    stop = "unfreeze"
+                    print("Starting Over!")
+                elif boxes.index(box) == 2:
+                    print(f"Goodbye and your score is {point}!")
+                    glutLeaveMainLoop() #terminate window
+                else:
+                    if play =="resume":
+                      stop = "freeze"
+                      play ="stop"
+                    else:
+                      stop = "unfreeze"
+                      play ="resume"
+                        
 
 def initialize():
     glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT)
@@ -249,50 +289,53 @@ def show_screen():
 
 
 def keyboard_special_keys(key, _, __):
-    global move, box
-    if key == GLUT_KEY_LEFT:
-        if move != -190:
-            box1.x -= box_speed
-            move-=7
-    elif key == GLUT_KEY_RIGHT:
-        if move != 190:
-            box1.x += box_speed
-            move+=7
+    global move, box, game
+    if stop == "unfreeze":
+      if game == "continue":
+          if key == GLUT_KEY_LEFT:
+              if move != -182:
+                  box1.x -= box_speed
+                  move-=7
+          elif key == GLUT_KEY_RIGHT:
+              if move != 182:
+                  box1.x += box_speed
+                  move+=7
         
 
     glutPostRedisplay()
 
 def animation():
-    global fall,randomValue,diamondColor,r,g,b,colorFour,box1, collision,diamondCornerThirty, point,game,speed, basketOver
+    global fall,randomValue,diamondColor,r,g,b,colorFour,box1, collision,diamondCornerThirty, point,game,speed, basketOver, stop
     check_collision()
 
-    if game == "continue":
-        if speed <= .3:
-          fall-=speed
-          box2.y-=speed
-        else:
-          fall-=.2
-          box2.y-=.2
-        if collision:
-            fall = 0
-            randomValue = random.randint(0, 440)
-            box2.y = 510
-            box2.x = randomValue+15
-            previous = diamondColor
-            colorFour.remove(previous)
-            diamondColor = random.choice(colorFour)
-            colorFour.append(previous)
-            r = diamondColor[0]
-            g = diamondColor[1]
-            b = diamondColor[2]
-            collision = False
-            speed+=.05
-            point+=1
-            print(f"You Scored {point}")
-        elif fall < -551:
-            print(f"Game Over your score {point}!")
-            game="finished"
-            basketOver = True
+    if stop == "unfreeze":
+      if game == "continue":
+          if speed <= .5:
+            fall-=speed
+            box2.y-=speed
+          else:
+            fall-=.5
+            box2.y-=.5
+          if collision:
+              fall = 0
+              randomValue = random.randint(0, 440)
+              box2.y = 510
+              box2.x = randomValue+15
+              previous = diamondColor
+              colorFour.remove(previous)
+              diamondColor = random.choice(colorFour)
+              colorFour.append(previous)
+              r = diamondColor[0]
+              g = diamondColor[1]
+              b = diamondColor[2]
+              collision = False
+              speed+=.05
+              point+=1
+              print(f"You Scored {point}")
+          elif fall < -551:
+              print(f"Game Over your score {point}!")
+              game="finished"
+              basketOver = True
 
 
 
@@ -304,14 +347,14 @@ glutInit()
 glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH)
 glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT)
 glutInitWindowPosition(0, 0)
-wind = glutCreateWindow(b"OpenGL AABB Collision")
+wind = glutCreateWindow(b"Catch the Diamonds!")
 
 glutDisplayFunc(show_screen)
 glutIdleFunc(animation)
 
 # glutKeyboardFunc(keyboard_ordinary_keys)
 glutSpecialFunc(keyboard_special_keys)
-# glutMouseFunc(mouse_click)
+glutMouseFunc(mouse_click)
 
 glEnable(GL_DEPTH_TEST)
 initialize()
