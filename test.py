@@ -262,17 +262,71 @@ def show_screen():
     drawLine(0,564,10,580)
     drawLine(0,565,10,550)
 
-    if play == "resume":
-      #pause
-      glColor3f(1.0, 0.647, 0.0)
-      drawLine(247,545,247,580)
-      drawLine(257,545,257,580)
+    if game != "finished":
+        if play == "resume":
+            #pause
+            glColor3f(1.0, 0.647, 0.0)
+            drawLine(247,545,247,580)
+            drawLine(257,545,257,580)
+        else:
+            #play
+            glColor3f(1.0, 0.647, 0.0)
+            drawLine(240,545,240,580)
+            drawLine(239,525,270,545)
+            drawLine(240,594,270,579)
     else:
-      #play
-      glColor3f(1.0, 0.647, 0.0)
-      drawLine(240,545,240,580)
-      drawLine(239,525,270,545)
-      drawLine(240,594,270,579)
+        #border
+        glColor3f(1.0, 0.647, 0.0)
+        drawLine(10,280,490,280)
+        drawLine(10,280,10,370)
+        drawLine(10,370,490,370)
+        drawLine(490,280,490,370)
+        drawLine(263,280,263,370)
+        #G
+        glColor3f(0.529, 0.808, 0.922)
+        drawLine(30,300,30,350)
+        drawLine(30,350,70,350)
+        drawLine(70,340,70,350)
+        drawLine(30,300,50,300)
+        drawLine(50,300,50,320)
+        drawLine(50,320,70,320)
+        drawLine(70,300,70,320)
+        #A
+        drawLine(90,300,90,350)
+        drawLine(90,350,120,350)
+        drawLine(90,330,120,330)
+        drawLine(120,300,120,350)
+        #M
+        drawLine(140,300,140,350)
+        drawLine(140,370,163,350)
+        drawLine(163,310,185,330)
+        drawLine(185,300,185,350)
+        #E
+        drawLine(205,300,205,350)
+        drawLine(205,350,235,350)
+        drawLine(205,325,235,325)
+        drawLine(205,300,235,300)
+        #O
+        glColor3f(1,0.0, 0.0)
+        drawLine(290,300,290,350)
+        drawLine(290,350,330,350)
+        drawLine(290,300,330,300)
+        drawLine(330,300,330,350)
+        #V
+        drawLine(320,350,340,300)
+        drawLine(340,300,360,350)
+        #E
+        drawLine(390,300,390,350)
+        drawLine(390,350,420,350)
+        drawLine(390,325,420,325)
+        drawLine(390,300,420,300)
+        #R
+        drawLine(440,300,440,350)
+        drawLine(440,350,470,350)
+        drawLine(440,325,470,325)
+        drawLine(470,325,470,350)
+        drawLine(440,350,470,325)
+
 
     #close
     glColor3f(1,0.0, 0.0)
